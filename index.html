@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Deblurring: A Beginner's Guide</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .math-notation {
+        font-family: "Times New Roman", serif;
+        font-style: italic;
+      }
+      .section-break {
+        page-break-inside: avoid;
+      }
+      .image-container {
+        margin: 2rem 0;
+        text-align: center;
+        page-break-inside: avoid;
+      }
+      .image-container img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .caption {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.5rem;
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body class="bg-white text-gray-800 leading-relaxed">
+    <div class="max-w-4xl mx-auto p-8">
+      <!-- Header -->
+      <div class="text-center mb-12 section-break">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+          Image Deblurring: A Beginner's Guide
+        </h1>
+        <p class="text-xl text-gray-600">
+          Understanding the Mathematics, Techniques, and Applications
+        </p>
+      </div>
+
+      <!-- Table of Contents -->
+      <div class="bg-gray-50 rounded-lg p-6 mb-12 section-break">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900">
+          Table of Contents
+        </h2>
+        <ul class="space-y-2 text-gray-700">
+          <li>1. Introduction to Image Deblurring</li>
+          <li>2. Mathematical Model of Image Blurring</li>
+          <li>3. Convolution: The Blurring Process Explained</li>
+          <li>4. Deconvolution: Reversing the Blur</li>
+          <li>5. The Role of Fourier Transform</li>
+          <li>6. Traditional Deblurring Techniques</li>
+          <li>7. Wiener Filter</li>
+          <li>8. Lucy-Richardson Deconvolution Algorithm</li>
+          <li>9. Blind Deconvolution Methods</li>
+          <li>10. Deep Learning-based Deblurring Techniques</li>
+          <li>11. Convolutional Neural Networks (CNNs)</li>
+          <li>12. Generative Adversarial Networks (GANs)</li>
+          <li>13. Training Datasets and Loss Functions</li>
+          <li>14. Significance and Applications</li>
+          <li>15. Conclusion</li>
+        </ul>
+      </div>
+
+      <!-- Section 1: Introduction -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          1. Introduction to Image Deblurring
+        </h2>
+        <p class="text-lg mb-6">
+          Image deblurring is the process of removing distortion from a blurry
+          image. This distortion can be caused by various factors including
+          camera shake, motion blur, atmospheric turbulence, or optical system
+          imperfections. The goal is to restore the original sharp image from
+          its degraded version.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="1.jpg"
+            alt="Before and after deblurring example" />
+          <p class="caption">
+            Figure 1: Example of AI deblurring technology showing before and
+            after comparison
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          Image blur occurs when the point spread function (PSF) of the imaging
+          system convolves with the original image. The challenge lies in
+          reversing this process to recover the sharp image. Modern deblurring
+          techniques range from traditional mathematical approaches to
+          sophisticated deep learning methods.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="2.png"
+            alt="Face deblurring comparison" />
+          <p class="caption">
+            Figure 2: Visual comparison of different face image deblurring
+            methods
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 2: Mathematical Model -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          2. Mathematical Model of Image Blurring
+        </h2>
+        <p class="text-lg mb-6">
+          The mathematical model of image blurring can be expressed as:
+        </p>
+        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+          <p class="text-center text-xl math-notation">
+            g(x, y) = h(x, y) * f(x, y) + n(x, y)
+          </p>
+        </div>
+        <p class="text-lg mb-6">Where:</p>
+        <ul class="list-disc list-inside text-lg mb-6 space-y-2">
+          <li>
+            <span class="math-notation">g(x, y)</span> is the observed blurred
+            image
+          </li>
+          <li>
+            <span class="math-notation">f(x, y)</span> is the original sharp
+            image
+          </li>
+          <li>
+            <span class="math-notation">h(x, y)</span> is the point spread
+            function (PSF)
+          </li>
+          <li><span class="math-notation">n(x, y)</span> is additive noise</li>
+          <li>
+            <span class="math-notation">*</span> denotes convolution operation
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 3: Convolution Process -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          3. Convolution: The Blurring Process Explained
+        </h2>
+        <p class="text-lg mb-6">
+          Convolution is the mathematical operation that describes how the PSF
+          affects the original image to produce blur. Understanding convolution
+          is crucial for comprehending how blur occurs and how it can be
+          reversed.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="3.jpg"
+            alt="Convolution visualization" />
+          <p class="caption">
+            Figure 3: Mathematical visualization of convolution operation in
+            image processing
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          The convolution operation slides the PSF across the entire image,
+          calculating the weighted sum at each position. This process spreads
+          the energy of each pixel across neighboring pixels, creating the blur
+          effect.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="4.png"
+            alt="Convolution process diagram" />
+          <p class="caption">
+            Figure 4: Step-by-step visualization of the convolution process
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 4: Deconvolution -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          4. Deconvolution: Reversing the Blur
+        </h2>
+        <p class="text-lg mb-6">
+          Deconvolution is the inverse process of convolution, aimed at
+          recovering the original image from the blurred observation. This is
+          mathematically challenging due to noise and the ill-posed nature of
+          the problem.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="5.webp"
+            alt="Deconvolution visualization" />
+          <p class="caption">
+            Figure 5: Visualization of the deconvolution operation
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          The challenge in deconvolution lies in the fact that it's an ill-posed
+          inverse problem. Small amounts of noise can be greatly amplified,
+          making direct inversion unstable. This is why sophisticated algorithms
+          are needed.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="6.png"
+            alt="Convolution-deconvolution system" />
+          <p class="caption">
+            Figure 6: Schematic representation of the convolution-deconvolution
+            system
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 5: Fourier Transform -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          5. The Role of Fourier Transform
+        </h2>
+        <p class="text-lg mb-6">
+          The Fourier Transform plays a crucial role in image deblurring by
+          converting the convolution operation in the spatial domain to
+          multiplication in the frequency domain. This transformation simplifies
+          the mathematical analysis and provides insights into the frequency
+          characteristics of blur.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="7.png"
+            alt="Spatial and frequency domain" />
+          <p class="caption">
+            Figure 7: Comparison between spatial and frequency domain
+            representations
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          In frequency domain, the relationship becomes:
+        </p>
+        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+          <p class="text-center text-xl math-notation">
+            G(u, v) = H(u, v) × F(u, v) + N(u, v)
+          </p>
+        </div>
+
+        <div class="image-container">
+          <img
+            src="8.png"
+            alt="Fourier filtering" />
+          <p class="caption">
+            Figure 8: Fourier transform filtering in frequency domain
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 6: Traditional Techniques -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          6. Traditional Deblurring Techniques
+        </h2>
+        <p class="text-lg mb-6">
+          Traditional deblurring techniques are based on mathematical models and
+          optimization algorithms. These methods have been extensively studied
+          and provide the foundation for understanding modern approaches.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="bg-blue-50 p-6 rounded-lg">
+            <h3 class="text-xl font-semibold mb-3 text-blue-900">
+              Inverse Filtering
+            </h3>
+            <p class="text-gray-700">
+              Direct inversion of the blur kernel in frequency domain. Simple
+              but sensitive to noise.
+            </p>
+          </div>
+          <div class="bg-green-50 p-6 rounded-lg">
+            <h3 class="text-xl font-semibold mb-3 text-green-900">
+              Regularization Methods
+            </h3>
+            <p class="text-gray-700">
+              Add constraints to stabilize the solution and reduce noise
+              amplification.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 7: Wiener Filter -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">7. Wiener Filter</h2>
+        <p class="text-lg mb-6">
+          The Wiener filter is an optimal linear filter that minimizes the mean
+          square error between the estimated and true images. It considers both
+          the blur kernel and noise characteristics.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="9.png"
+            alt="Wiener filter model" />
+          <p class="caption">
+            Figure 9: Mathematical model of the Wiener filter
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          The Wiener filter transfer function is given by:
+        </p>
+        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+          <p class="text-center text-xl math-notation">
+            W(u, v) = [H*(u, v)] / [|H(u, v)|² + Sn(u, v)/Sf(u, v)]
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 8: Lucy-Richardson Algorithm -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          8. Lucy-Richardson Deconvolution Algorithm
+        </h2>
+        <p class="text-lg mb-6">
+          The Lucy-Richardson algorithm is an iterative method based on Bayesian
+          inference and maximum likelihood estimation. It's particularly
+          effective for astronomical image deblurring and microscopy
+          applications.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="10.gif"
+            alt="Richardson-Lucy deconvolution" />
+          <p class="caption">
+            Figure 10: Richardson-Lucy deconvolution algorithm in action
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          The algorithm iteratively refines the estimate using:
+        </p>
+        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+          <p class="text-center text-xl math-notation">
+            f^(k+1) = f^(k) × [h(-x,-y) * (g / (h * f^(k)))]
+          </p>
+        </div>
+
+        <div class="image-container">
+          <img
+            src="11.png"
+            alt="Lucy-Richardson comparison" />
+          <p class="caption">
+            Figure 11: Comparison between blind deconvolution and
+            Lucy-Richardson method
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 9: Blind Deconvolution -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          9. Blind Deconvolution Methods
+        </h2>
+        <p class="text-lg mb-6">
+          Blind deconvolution addresses the challenging scenario where both the
+          original image and the blur kernel are unknown. These methods must
+          simultaneously estimate both the PSF and the sharp image.
+        </p>
+
+        <div class="bg-yellow-50 p-6 rounded-lg mb-6">
+          <h3 class="text-xl font-semibold mb-3 text-yellow-900">
+            Key Challenges
+          </h3>
+          <ul class="list-disc list-inside text-gray-700 space-y-2">
+            <li>Highly ill-posed problem with multiple solutions</li>
+            <li>Requires strong priors or regularization</li>
+            <li>Computationally expensive optimization</li>
+            <li>Sensitive to noise and initialization</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 10: Deep Learning Approaches -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          10. Deep Learning-based Deblurring Techniques
+        </h2>
+        <p class="text-lg mb-6">
+          Deep learning has revolutionized image deblurring by learning complex
+          mappings from blurred to sharp images directly from data. These
+          methods can handle various types of blur and achieve state-of-the-art
+          results.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="12.png"
+            alt="Deep learning deblurring survey" />
+          <p class="caption">
+            Figure 12: Overview of deep learning approaches for image deblurring
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="bg-purple-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-purple-900">
+              End-to-End Learning
+            </h3>
+            <p class="text-gray-700">
+              Direct mapping from blurred to sharp images
+            </p>
+          </div>
+          <div class="bg-red-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-red-900">
+              Multi-Scale Processing
+            </h3>
+            <p class="text-gray-700">
+              Handling blur at different scales simultaneously
+            </p>
+          </div>
+          <div class="bg-indigo-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-indigo-900">
+              Attention Mechanisms
+            </h3>
+            <p class="text-gray-700">
+              Focusing on important regions for deblurring
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 11: CNNs -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          11. Convolutional Neural Networks (CNNs)
+        </h2>
+        <p class="text-lg mb-6">
+          CNNs are the backbone of modern image deblurring systems. They excel
+          at learning spatial hierarchies and can effectively model the complex
+          relationship between blurred and sharp images.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="13.png"
+            alt="U-Net architecture for deblurring" />
+          <p class="caption">
+            Figure 13: U-Net architecture adapted for image deblurring
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          Popular CNN architectures for deblurring include:
+        </p>
+        <ul class="list-disc list-inside text-lg mb-6 space-y-2">
+          <li><strong>U-Net:</strong> Encoder-decoder with skip connections</li>
+          <li>
+            <strong>ResNet:</strong> Residual connections for deep networks
+          </li>
+          <li>
+            <strong>DenseNet:</strong> Dense connections for feature reuse
+          </li>
+          <li>
+            <strong>Multi-scale networks:</strong> Processing at multiple
+            resolutions
+          </li>
+        </ul>
+
+        <div class="image-container">
+          <img
+            src="14.png"
+            alt="CNN deblurring results" />
+          <p class="caption">
+            Figure 14: Results comparison of different CNN-based deblurring
+            methods
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 12: GANs -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          12. Generative Adversarial Networks (GANs)
+        </h2>
+        <p class="text-lg mb-6">
+          GANs have shown remarkable success in image deblurring by generating
+          perceptually realistic sharp images. The adversarial training helps
+          produce images that are both mathematically accurate and visually
+          appealing.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="15.png"
+            alt="GAN CNN deblurring" />
+          <p class="caption">
+            Figure 15: GAN-based deblurring architecture combining CNN and GAN
+          </p>
+        </div>
+
+        <div class="image-container">
+          <img
+            src="16.png"
+            alt="GAN deblurring network" />
+          <p class="caption">
+            Figure 16: Deep single image deblurring network based on GAN
+            architecture
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">Key advantages of GAN-based approaches:</p>
+        <ul class="list-disc list-inside text-lg mb-6 space-y-2">
+          <li>Generate perceptually realistic textures and details</li>
+          <li>Better handling of severe blur cases</li>
+          <li>Improved visual quality metrics</li>
+          <li>Robust to different types of blur</li>
+        </ul>
+
+        <div class="image-container">
+          <img
+            src="17.png"
+            alt="Cycle Deblur GAN" />
+          <p class="caption">
+            Figure 17: Architecture of Cycle-Deblur GAN for unsupervised
+            learning
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 13: Training and Loss Functions -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          13. Training Datasets and Loss Functions
+        </h2>
+        <p class="text-lg mb-6">
+          The success of deep learning approaches heavily depends on
+          high-quality training data and appropriate loss functions that capture
+          both pixel-level accuracy and perceptual quality.
+        </p>
+
+        <div class="bg-gray-50 p-6 rounded-lg mb-6">
+          <h3 class="text-xl font-semibold mb-4 text-gray-900">
+            Common Datasets
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg">
+              <h4 class="font-semibold text-blue-900">GoPro Dataset</h4>
+              <p class="text-gray-700 text-sm">
+                High-quality image pairs with motion blur
+              </p>
+            </div>
+            <div class="bg-white p-4 rounded-lg">
+              <h4 class="font-semibold text-green-900">REDS Dataset</h4>
+              <p class="text-gray-700 text-sm">
+                Video deblurring and super-resolution
+              </p>
+            </div>
+            <div class="bg-white p-4 rounded-lg">
+              <h4 class="font-semibold text-purple-900">RealBlur</h4>
+              <p class="text-gray-700 text-sm">Real-world blur scenarios</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg">
+              <h4 class="font-semibold text-red-900">HIDE Dataset</h4>
+              <p class="text-gray-700 text-sm">Human-aware motion deblurring</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 p-6 rounded-lg mb-6">
+          <h3 class="text-xl font-semibold mb-4 text-blue-900">
+            Loss Functions
+          </h3>
+          <ul class="space-y-3 text-gray-700">
+            <li><strong>L1 Loss:</strong> Pixel-wise absolute difference</li>
+            <li><strong>L2 Loss:</strong> Mean squared error</li>
+            <li><strong>Perceptual Loss:</strong> Feature-based similarity</li>
+            <li><strong>Adversarial Loss:</strong> GAN training objective</li>
+            <li><strong>SSIM Loss:</strong> Structural similarity</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 14: Applications -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          14. Significance and Applications of Image Deblurring
+        </h2>
+        <p class="text-lg mb-6">
+          Image deblurring has wide-ranging applications across various fields,
+          from consumer photography to scientific imaging and medical
+          diagnostics.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="18.png"
+            alt="Deblurring methods comparison" />
+          <p class="caption">
+            Figure 18: Qualitative comparison of different deblurring methods on
+            real-world images
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <div class="bg-green-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-green-900">
+              Photography
+            </h3>
+            <p class="text-gray-700">
+              Improving handheld photos, sports photography, low-light
+              conditions
+            </p>
+          </div>
+          <div class="bg-blue-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-blue-900">
+              Medical Imaging
+            </h3>
+            <p class="text-gray-700">
+              Enhancing MRI, CT scans, microscopy images for better diagnosis
+            </p>
+          </div>
+          <div class="bg-purple-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-purple-900">
+              Astronomy
+            </h3>
+            <p class="text-gray-700">
+              Correcting atmospheric distortions in telescope images
+            </p>
+          </div>
+          <div class="bg-red-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-red-900">
+              Surveillance
+            </h3>
+            <p class="text-gray-700">
+              Enhancing security camera footage, license plate recognition
+            </p>
+          </div>
+          <div class="bg-yellow-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-yellow-900">
+              Microscopy
+            </h3>
+            <p class="text-gray-700">
+              Improving resolution in biological and materials science imaging
+            </p>
+          </div>
+          <div class="bg-indigo-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-indigo-900">
+              Mobile Photography
+            </h3>
+            <p class="text-gray-700">
+              Real-time deblurring in smartphone cameras
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 15: Conclusion -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">15. Conclusion</h2>
+        <p class="text-lg mb-6">
+          Image deblurring has evolved from simple mathematical inversions to
+          sophisticated deep learning systems. The field continues to advance
+          with new architectures, training strategies, and applications.
+        </p>
+
+        <div
+          class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg mb-6">
+          <h3 class="text-xl font-semibold mb-4 text-gray-900">
+            Future Directions
+          </h3>
+          <ul class="space-y-2 text-gray-700">
+            <li>• Real-time processing for video and mobile applications</li>
+            <li>• Handling extreme blur and motion scenarios</li>
+            <li>• Unsupervised and self-supervised learning approaches</li>
+            <li>• Integration with other image enhancement techniques</li>
+            <li>
+              • Domain-specific optimizations for medical, astronomical, and
+              industrial applications
+            </li>
+          </ul>
+        </div>
+
+        <p class="text-lg mb-6">
+          The combination of traditional mathematical foundations with modern
+          deep learning techniques provides a robust framework for tackling
+          increasingly complex deblurring challenges. As computational power
+          increases and new datasets become available, we can expect even more
+          impressive results in the future.
+        </p>
+
+        <div class="bg-gray-100 p-6 rounded-lg">
+          <h3 class="text-xl font-semibold mb-4 text-gray-900">
+            Key Takeaways
+          </h3>
+          <ul class="space-y-2 text-gray-700">
+            <li>
+              • Image deblurring is fundamentally an inverse problem requiring
+              careful mathematical treatment
+            </li>
+            <li>
+              • Traditional methods provide important theoretical foundations
+              and remain relevant
+            </li>
+            <li>
+              • Deep learning approaches achieve state-of-the-art results but
+              require substantial training data
+            </li>
+            <li>
+              • The choice of method depends on the specific application,
+              computational constraints, and quality requirements
+            </li>
+            <li>
+              • Future developments will likely combine the best of both
+              traditional and learning-based approaches
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer
+        class="text-center text-gray-600 mt-12 pt-8 border-t border-gray-200">
+        <p class="text-sm">
+          Image Deblurring: A Beginner's Guide - Comprehensive overview of
+          techniques and applications
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
