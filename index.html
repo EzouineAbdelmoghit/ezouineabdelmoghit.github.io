@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Deblurring: A Beginner's Guide</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .math-notation {
+        font-family: "Times New Roman", serif;
+        font-style: italic;
+      }
+      .section-break {
+        page-break-inside: avoid;
+      }
+      .image-container {
+        margin: 2rem 0;
+        text-align: center;
+        page-break-inside: avoid;
+      }
+      .image-container img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .caption {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.5rem;
+        font-style: italic;
+      }
+    </style>
+    <script
+      id="MathJax-script"
+      async
+      src="/mathjax/es5/tex-mml-chtml.js"></script>
+  </head>
+  <body class="bg-white text-gray-800 leading-relaxed">
+    <div class="max-w-4xl mx-auto p-8">
+      <!-- Header -->
+      <div class="text-center mb-12 section-break">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+          Défloutage d'images : Un guide pour débutants
+        </h1>
+        <p class="text-xl text-gray-600">
+          Comprendre les mathématiques, les techniques et les applications
+        </p>
+      </div>
+
+      <!-- Table of Contents -->
+      <div class="bg-gray-50 rounded-lg p-6 mb-12 section-break">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-900">
+          Table des matières
+        </h2>
+        <ul class="space-y-2 text-gray-700">
+          <li>1. Introduction au défloutage d'images</li>
+          <li>2. Modèle mathématique du flou d'image</li>
+          <li>3. Convolution : explication du processus de flou</li>
+          <li>4. Déconvolution : inverser le flou</li>
+          <li>5. Le rôle de la transformée de Fourier</li>
+          <li>6. Techniques traditionnelles de défloutage</li>
+          <li>7. Filtre de Wiener</li>
+          <li>8. Algorithme de déconvolution de Lucy-Richardson</li>
+          <li>9. Méthodes de déconvolution aveugle</li>
+          <li>
+            10. Techniques de défloutage basées sur l'apprentissage profond
+          </li>
+          <li>11. Réseaux neuronaux convolutifs (CNN)</li>
+          <li>12. Réseaux antagonistes génératifs (GAN)</li>
+          <li>
+            13. Ensembles de données et fonctions de perte pour l'entraînement
+          </li>
+          <li>14. Importance et applications</li>
+          <li>15. Conclusion</li>
+        </ul>
+      </div>
+
+      <!-- Section 1: Introduction -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          1. Introduction au défloutage d'images
+        </h2>
+        <p class="text-lg mb-6">
+          Le défloutage d'image est le processus consistant à éliminer les
+          distorsions présentes dans une image floue. Ce flou peut être causé
+          par divers facteurs tels que le trémolo de l'appareil photo, le flou
+          de mouvement, la turbulence atmosphérique ou des imperfections du
+          système optique. L'objectif est de restaurer l'image originale nette à
+          partir de sa version dégradée.
+        </p>
+
+        <div class="image-container">
+          <img src="1.jpg" alt="Exemple avant et après défloutage" />
+          <p class="caption">
+            Figure 1 : Exemple de technologie de défloutage par l'IA montrant
+            une comparaison avant et après
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          Le flou d'image se produit lorsque la fonction d'étalement du point
+          (PSF) du système d'imagerie se convolue avec l'image originale. Le
+          défi consiste à inverser ce processus afin de retrouver l'image nette.
+          Les techniques modernes de défloutage vont des approches mathématiques
+          traditionnelles à des méthodes sophistiquées basées sur
+          l'apprentissage profond.
+        </p>
+
+        <div class="image-container">
+          <img src="2.png" alt="Comparaison du défloutage de visages" />
+          <p class="caption">
+            Figure 2 : Comparaison visuelle des différentes méthodes de
+            défloutage d'images de visages
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 2: Mathematical Model -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          2. Modèle mathématique du flou d'image
+        </h2>
+        <p class="text-lg mb-6">
+          Le modèle mathématique du flou d'image peut être exprimé comme suit :
+        </p>
+        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+          <p class="text-center text-xl math-notation">
+            g(x, y) = h(x, y) * f(x, y) + n(x, y)
+          </p>
+        </div>
+        <p class="text-lg mb-6">Où :</p>
+        <ul class="list-disc list-inside text-lg mb-6 space-y-2">
+          <li>
+            <span class="math-notation">g(x, y)</span> est l'image floue
+            observée
+          </li>
+          <li>
+            <span class="math-notation">f(x, y)</span> est l'image originale
+            nette
+          </li>
+          <li>
+            <span class="math-notation">h(x, y)</span> est la fonction
+            d'étalement du point (PSF)
+          </li>
+          <li>
+            <span class="math-notation">n(x, y)</span> est le bruit additif
+          </li>
+          <li>
+            <span class="math-notation">*</span> désigne l'opération de
+            convolution
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 3: Convolution Process -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          3. Convolution : explication du processus de flou
+        </h2>
+        <p class="text-lg mb-6">
+          La convolution est l'opération mathématique qui décrit comment la
+          fonction d'étalement du point (PSF) affecte l'image originale pour
+          produire un flou. Comprendre la convolution est essentiel pour saisir
+          le mécanisme du flou et la manière de le corriger.
+        </p>
+
+        <div class="image-container">
+          <img src="3.jpg" alt="Visualisation de la convolution" />
+          <p class="caption">
+            Figure 3 : Visualisation mathématique de l'opération de convolution
+            en traitement d'image
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          L'opération de convolution applique la PSF à travers toute l'image, en
+          calculant la somme pondérée à chaque position. Ce processus répartit
+          l'énergie de chaque pixel sur les pixels voisins, créant ainsi l'effet
+          de flou.
+        </p>
+
+        <div class="image-container">
+          <img src="4.png" alt="Diagramme du processus de convolution" />
+          <p class="caption">
+            Figure 4 : Visualisation étape par étape du processus de convolution
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 4: Deconvolution -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          4. Déconvolution : inverser le flou
+        </h2>
+        <p class="text-lg mb-6">
+          La déconvolution est le processus inverse de la convolution, visant à
+          retrouver l'image originale à partir de l'observation floue. Cela
+          présente un défi mathématique en raison du bruit et de la nature mal
+          posée du problème.
+        </p>
+
+        <div class="image-container">
+          <img src="5.webp" alt="Visualisation de la déconvolution" />
+          <p class="caption">
+            Figure 5 : Visualisation de l'opération de déconvolution
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          La difficulté en déconvolution réside dans le fait qu'il s'agit d'un
+          problème inverse mal posé. De faibles quantités de bruit peuvent être
+          fortement amplifiées, rendant l'inversion directe instable. C'est
+          pourquoi des algorithmes sophistiqués sont nécessaires.
+        </p>
+
+        <div class="image-container">
+          <img src="6.png" alt="Système convolution-déconvolution" />
+          <p class="caption">
+            Figure 6 : Représentation schématique du système de
+            convolution-déconvolution
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 5: Fourier Transform -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          5. Le rôle de la transformée de Fourier
+        </h2>
+        <p class="text-lg mb-6">
+          La transformée de Fourier joue un rôle essentiel dans le défloutage
+          d'images en convertissant l'opération de convolution dans le domaine
+          spatial en une multiplication dans le domaine fréquentiel. Cette
+          transformation simplifie l'analyse mathématique et permet d'obtenir
+          des informations sur les caractéristiques fréquentielles du flou.
+        </p>
+
+        <div class="image-container">
+          <img src="7.png" alt="Domaines spatial et fréquentiel" />
+          <p class="caption">
+            Figure 7 : Comparaison entre les représentations dans le domaine
+            spatial et fréquentiel
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          Dans le domaine fréquentiel, la relation devient :
+        </p>
+        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+          <p class="text-center text-xl math-notation">
+            G(u, v) = H(u, v) × F(u, v) + N(u, v)
+          </p>
+        </div>
+
+        <div class="image-container">
+          <img src="8.png" alt="Filtrage par transformée de Fourier" />
+          <p class="caption">
+            Figure 8 : Filtrage par transformée de Fourier dans le domaine
+            fréquentiel
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 6: Traditional Techniques -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          6. Techniques traditionnelles de défloutage
+        </h2>
+        <p class="text-lg mb-6">
+          Les techniques traditionnelles de défloutage reposent sur des modèles
+          mathématiques et des algorithmes d'optimisation. Ces méthodes ont été
+          largement étudiées et constituent la base pour comprendre les
+          approches modernes.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="bg-blue-50 p-6 rounded-lg">
+            <h3 class="text-xl font-semibold mb-3 text-blue-900">
+              Filtrage inverse
+            </h3>
+            <p class="text-gray-700">
+              Inversion directe du noyau de flou dans le domaine fréquentiel.
+              Simple mais sensible au bruit.
+            </p>
+          </div>
+          <div class="bg-green-50 p-6 rounded-lg">
+            <h3 class="text-xl font-semibold mb-3 text-green-900">
+              Méthodes de régularisation
+            </h3>
+            <p class="text-gray-700">
+              Ajout de contraintes pour stabiliser la solution et réduire
+              l'amplification du bruit.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 7: Wiener Filter -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          7. Filtre de Wiener
+        </h2>
+        <p class="text-lg mb-6">
+          Le filtre de Wiener est un filtre linéaire optimal qui minimise
+          l'erreur quadratique moyenne entre l'image estimée et l'image réelle.
+          Il prend en compte à la fois le noyau de flou et les caractéristiques
+          du bruit.
+        </p>
+
+        <div class="image-container">
+          <img src="9.png" alt="Modèle du filtre de Wiener" />
+          <p class="caption">
+            Figure 9 : Modèle mathématique du filtre de Wiener
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          La fonction de transfert du filtre de Wiener est donnée par :
+        </p>
+        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+          <p class="text-center text-xl math-notation">
+            $$ W(u, v) = \frac{H^*(u, v)}{|H(u, v)|^2 + \frac{S_n(u, v)}{S_f(u,
+            v)}} $$
+          </p>
+        </div>
+        <p class="text-lg mb-6">Où :</p>
+
+        <ul class="list-disc list-inside text-lg mb-6 space-y-2">
+          <li>
+            <span class="math-notation font-medium">W(u, v)</span> : Fonction de
+            transfert du filtre de Wiener dans le domaine fréquentiel
+          </li>
+          <li>
+            <span class="math-notation font-medium">H(u, v)</span> : Réponse en
+            fréquence du système de dégradation (par exemple, flou)
+          </li>
+          <li>
+            <span class="math-notation font-medium">H*(u, v)</span> : Conjugué
+            complexe de <span class="math-notation">H(u, v)</span>
+          </li>
+          <li>
+            <span class="math-notation font-medium"
+              >|H(u, v)|² = H(u, v) ⋅ H^*(u, v)</span
+            >
+            : Carré du module de la réponse en fréquence
+          </li>
+          <li>
+            <span class="math-notation font-medium">Sₙ(u, v)</span> : Densité
+            spectrale de puissance (DSP) du bruit
+          </li>
+          <li>
+            <span class="math-notation font-medium">S<sub>f</sub>(u, v)</span> :
+            Densité spectrale de puissance (DSP) du signal ou de l'image
+            originale non dégradée
+          </li>
+        </ul>
+      </section>
+
+      <!-- Section 8: Lucy-Richardson Algorithm -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          8. Algorithme de déconvolution de Lucy-Richardson
+        </h2>
+        <p class="text-lg mb-6">
+          L'algorithme de Lucy-Richardson est une méthode itérative basée sur
+          l'inférence bayésienne et l'estimation du maximum de vraisemblance. Il
+          est particulièrement efficace pour le défloutage d'images
+          astronomiques et dans les applications de microscopie.
+        </p>
+
+        <div class="image-container">
+          <img src="10.gif" alt="Déconvolution Richardson-Lucy" />
+          <p class="caption">
+            Figure 10 : Algorithme de déconvolution Richardson-Lucy en action
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          L'algorithme affine itérativement l'estimation à l'aide de la formule
+          suivante :
+        </p>
+        <div class="bg-gray-100 p-4 rounded-lg mb-6">
+          <p class="text-center text-xl math-notation">
+            $$ \hat{f}^{(k+1)} = \hat{f}^{(k)} \times \left[ h(-x, -y) * \left(
+            \frac{g}{h * \hat{f}^{(k)}} \right) \right] $$
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">Où :</p>
+
+        <ul class="list-disc list-inside text-lg mb-6 space-y-2">
+          <li>
+            <span class="math-notation font-medium">f<sup>(k)</sup></span> :
+            L'image estimée à l'itération <span class="math-notation">k</span>
+          </li>
+          <li>
+            <span class="math-notation font-medium">g</span> : L'image observée
+            (floue et possiblement bruitée)
+          </li>
+          <li>
+            <span class="math-notation font-medium">h</span> : La fonction
+            d'étalement du point (PSF), c'est-à-dire le noyau de flou
+          </li>
+          <li>
+            <span class="math-notation font-medium">h(-x, -y)</span> : PSF
+            inversée (c.-à-d. noyau retourné), utilisée dans l'étape de mise à
+            jour
+          </li>
+          <li>
+            <span class="math-notation font-medium">*</span> : Opérateur de
+            convolution
+          </li>
+          <li>
+            <span class="math-notation font-medium">×</span> : Multiplication
+            pixel par pixel (échelle ponctuelle)
+          </li>
+          <li>
+            <span class="math-notation font-medium">/</span> : Division pixel
+            par pixel
+          </li>
+        </ul>
+
+        <div class="image-container">
+          <img src="11.png" alt="Comparaison Lucy-Richardson" />
+          <p class="caption">
+            Figure 11 : Comparaison entre la déconvolution aveugle et la méthode
+            de Lucy-Richardson
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 9: Blind Deconvolution -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          9. Méthodes de déconvolution aveugle
+        </h2>
+        <p class="text-lg mb-6">
+          La déconvolution aveugle s'attaque au cas difficile où à la fois
+          l'image originale et le noyau de flou sont inconnus. Ces méthodes
+          doivent estimer simultanément la fonction d'étalement du point (PSF)
+          et l'image nette.
+        </p>
+
+        <div class="bg-yellow-50 p-6 rounded-lg mb-6">
+          <h3 class="text-xl font-semibold mb-3 text-yellow-900">
+            Principaux défis
+          </h3>
+          <ul class="list-disc list-inside text-gray-700 space-y-2">
+            <li>Problème très mal posé avec plusieurs solutions possibles</li>
+            <li>Nécessite des a priori ou une régularisation forts</li>
+            <li>Optimisation coûteuse en temps de calcul</li>
+            <li>Sensible au bruit et à l'initialisation</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 10: Deep Learning Approaches -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          10. Techniques de défloutage basées sur l'apprentissage profond
+        </h2>
+        <p class="text-lg mb-6">
+          L'apprentissage profond a révolutionné le défloutage d'images en
+          apprenant des correspondances complexes entre les images floues et
+          nettes directement à partir des données. Ces méthodes peuvent gérer
+          divers types de flou et obtenir des résultats à l'état de l'art.
+        </p>
+
+        <div class="image-container">
+          <img
+            src="12.png"
+            alt="Aperçu du défloutage par apprentissage profond" />
+          <p class="caption">
+            Figure 12 : Aperçu des approches d'apprentissage profond pour le
+            défloutage d'images
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="bg-purple-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-purple-900">
+              Apprentissage de bout en bout
+            </h3>
+            <p class="text-gray-700">
+              Correspondance directe entre images floues et images nettes
+            </p>
+          </div>
+          <div class="bg-red-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-red-900">
+              Traitement multi-échelle
+            </h3>
+            <p class="text-gray-700">
+              Gestion simultanée du flou à différentes échelles
+            </p>
+          </div>
+          <div class="bg-indigo-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-indigo-900">
+              Mécanismes d'attention
+            </h3>
+            <p class="text-gray-700">
+              Mise au point sur les régions importantes pour le défloutage
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 11: CNNs -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          11. Réseaux neuronaux convolutifs (CNN)
+        </h2>
+        <p class="text-lg mb-6">
+          Les réseaux neuronaux convolutifs (CNN) constituent la base des
+          systèmes modernes de défloutage d'images. Ils excellent dans
+          l'apprentissage des hiérarchies spatiales et peuvent modéliser
+          efficacement la relation complexe entre les images floues et les
+          images nettes.
+        </p>
+
+        <div class="image-container">
+          <img src="13.png" alt="Architecture U-Net pour le défloutage" />
+          <p class="caption">
+            Figure 13 : Architecture U-Net adaptée au défloutage d'images
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          Les architectures CNN populaires pour le défloutage incluent :
+        </p>
+        <ul class="list-disc list-inside text-lg mb-6 space-y-2">
+          <li>
+            <strong>U-Net :</strong> Encodeur-décodeur avec connexions sautées
+          </li>
+          <li>
+            <strong>ResNet :</strong> Connexions résiduelles pour les réseaux
+            profonds
+          </li>
+          <li>
+            <strong>DenseNet :</strong> Connexions denses pour la réutilisation
+            des caractéristiques
+          </li>
+          <li>
+            <strong>Réseaux multi-échelles :</strong> Traitement à plusieurs
+            résolutions
+          </li>
+        </ul>
+
+        <div class="image-container">
+          <img src="14.png" alt="Résultats de défloutage par CNN" />
+          <p class="caption">
+            Figure 14 : Comparaison des résultats de différentes méthodes de
+            défloutage basées sur les CNN
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 12: GANs -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          12. Réseaux antagonistes génératifs (GAN)
+        </h2>
+        <p class="text-lg mb-6">
+          Les GAN (Generative Adversarial Networks) ont connu un succès
+          remarquable dans le défloutage d'images en générant des images nettes
+          réalistes du point de vue visuel. L'apprentissage adversaire permet de
+          produire des images à la fois mathématiquement précises et
+          esthétiquement attrayantes.
+        </p>
+
+        <div class="image-container">
+          <img src="15.png" alt="Défloutage combinant CNN et GAN" />
+          <p class="caption">
+            Figure 15 : Architecture de défloutage basée sur les GAN combinant
+            CNN et GAN
+          </p>
+        </div>
+
+        <div class="image-container">
+          <img src="16.png" alt="Réseau de défloutage par GAN" />
+          <p class="caption">
+            Figure 16 : Réseau de défloutage d'image unique basé sur
+            l'architecture GAN
+          </p>
+        </div>
+
+        <p class="text-lg mb-6">
+          Avantages principaux des approches basées sur les GAN :
+        </p>
+        <ul class="list-disc list-inside text-lg mb-6 space-y-2">
+          <li>Génèrent des textures et des détails réalistes visuellement</li>
+          <li>Meilleure gestion des cas de flou sévère</li>
+          <li>Amélioration des métriques de qualité visuelle</li>
+          <li>Résilients face aux différents types de flou</li>
+        </ul>
+
+        <div class="image-container">
+          <img src="17.png" alt="Cycle Deblur GAN" />
+          <p class="caption">
+            Figure 17 : Architecture de Cycle-Deblur GAN pour l'apprentissage
+            non supervisé
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 13: Training and Loss Functions -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          13. Ensembles d'entraînement et fonctions de perte
+        </h2>
+        <p class="text-lg mb-6">
+          Le succès des approches basées sur l'apprentissage profond dépend
+          largement de données d'entraînement de haute qualité ainsi que de
+          fonctions de perte adaptées, capables de mesurer à la fois la
+          précision au niveau des pixels et la qualité perceptive.
+        </p>
+
+        <div class="bg-gray-50 p-6 rounded-lg mb-6">
+          <h3 class="text-xl font-semibold mb-4 text-gray-900">
+            Ensembles de données courants
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg">
+              <h4 class="font-semibold text-blue-900">Base de données GoPro</h4>
+              <p class="text-gray-700 text-sm">
+                Paires d'images de haute qualité avec flou de mouvement
+              </p>
+            </div>
+            <div class="bg-white p-4 rounded-lg">
+              <h4 class="font-semibold text-green-900">Base de données REDS</h4>
+              <p class="text-gray-700 text-sm">
+                Défloutage vidéo et super-résolution
+              </p>
+            </div>
+            <div class="bg-white p-4 rounded-lg">
+              <h4 class="font-semibold text-purple-900">RealBlur</h4>
+              <p class="text-gray-700 text-sm">Scénarios réels de flou</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg">
+              <h4 class="font-semibold text-red-900">Base de données HIDE</h4>
+              <p class="text-gray-700 text-sm">
+                Défloutage de mouvement prenant en compte les personnes
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 p-6 rounded-lg mb-6">
+          <h3 class="text-xl font-semibold mb-4 text-blue-900">
+            Fonctions de perte
+          </h3>
+          <ul class="space-y-3 text-gray-700">
+            <li><strong>L1 Loss :</strong> Différence absolue par pixel</li>
+            <li><strong>L2 Loss :</strong> Erreur quadratique moyenne</li>
+            <li>
+              <strong>Perceptual Loss :</strong> Similarité basée sur les
+              caractéristiques visuelles
+            </li>
+            <li>
+              <strong>Adversarial Loss :</strong> Objectif d'entraînement des
+              GAN
+            </li>
+            <li><strong>SSIM Loss :</strong> Similarité structurelle</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Section 14: Applications -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">
+          14. Importance et applications du défloutage d'images
+        </h2>
+        <p class="text-lg mb-6">
+          Le défloutage d'images trouve des applications variées dans de
+          nombreux domaines, allant de la photographie amateur à l'imagerie
+          scientifique et au diagnostic médical.
+        </p>
+
+        <div class="image-container">
+          <img src="18.png" alt="Comparaison des méthodes de défloutage" />
+          <p class="caption">
+            Figure 18 : Comparaison qualitative des différentes méthodes de
+            défloutage sur des images réelles
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <div class="bg-green-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-green-900">
+              Photographie
+            </h3>
+            <p class="text-gray-700">
+              Amélioration des photos prises à main levée, photographie
+              sportive, conditions de faible luminosité
+            </p>
+          </div>
+          <div class="bg-blue-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-blue-900">
+              Imagerie médicale
+            </h3>
+            <p class="text-gray-700">
+              Amélioration des IRM, scanners CT, images microscopiques pour un
+              meilleur diagnostic
+            </p>
+          </div>
+          <div class="bg-purple-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-purple-900">
+              Astronomie
+            </h3>
+            <p class="text-gray-700">
+              Correction des distorsions atmosphériques dans les images
+              télescopiques
+            </p>
+          </div>
+          <div class="bg-red-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-red-900">
+              Vidéosurveillance
+            </h3>
+            <p class="text-gray-700">
+              Amélioration des vidéos de caméras de sécurité, reconnaissance de
+              plaques d'immatriculation
+            </p>
+          </div>
+          <div class="bg-yellow-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-yellow-900">
+              Microscopie
+            </h3>
+            <p class="text-gray-700">
+              Amélioration de la résolution en imagerie biologique et en science
+              des matériaux
+            </p>
+          </div>
+          <div class="bg-indigo-50 p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-3 text-indigo-900">
+              Photographie mobile
+            </h3>
+            <p class="text-gray-700">
+              Défloutage en temps réel dans les appareils photo des smartphones
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 15: Conclusion -->
+      <section class="mb-12 section-break">
+        <h2 class="text-3xl font-bold mb-6 text-gray-900">15. Conclusion</h2>
+        <p class="text-lg mb-6">
+          Le défloutage d'images a évolué depuis les simples inversions
+          mathématiques jusqu'à des systèmes avancés basés sur l'apprentissage
+          profond. Le domaine continue d'évoluer grâce à de nouvelles
+          architectures, stratégies d'entraînement et applications.
+        </p>
+
+        <div
+          class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-lg mb-6">
+          <h3 class="text-xl font-semibold mb-4 text-gray-900">
+            Perspectives futures
+          </h3>
+          <ul class="space-y-2 text-gray-700">
+            <li>
+              • Traitement en temps réel pour les vidéos et les applications
+              mobiles
+            </li>
+            <li>• Gestion des cas extrêmes de flou et de mouvement</li>
+            <li>• Approches sans supervision et auto-supervisées</li>
+            <li>
+              • Intégration avec d'autres techniques d'amélioration d'images
+            </li>
+            <li>
+              • Optimisations spécifiques aux domaines médicaux, astronomiques
+              et industriels
+            </li>
+          </ul>
+        </div>
+
+        <p class="text-lg mb-6">
+          La combinaison des fondements mathématiques traditionnels et des
+          techniques modernes d'apprentissage profond offre un cadre solide pour
+          relever des défis de défloutage de plus en plus complexes. À mesure
+          que la puissance de calcul augmente et que de nouveaux ensembles de
+          données deviennent disponibles, nous pouvons anticiper des résultats
+          encore plus impressionnants à l’avenir.
+        </p>
+
+        <div class="bg-gray-100 p-6 rounded-lg">
+          <h3 class="text-xl font-semibold mb-4 text-gray-900">
+            Points clés à retenir
+          </h3>
+          <ul class="space-y-2 text-gray-700">
+            <li>
+              • Le défloutage d'images est fondamentalement un problème inverse
+              nécessitant une approche mathématique rigoureuse
+            </li>
+            <li>
+              • Les méthodes traditionnelles apportent des bases théoriques
+              importantes et restent pertinentes
+            </li>
+            <li>
+              • Les approches par apprentissage profond atteignent des
+              performances de pointe mais nécessitent des données d'entraînement
+              conséquentes
+            </li>
+            <li>
+              • Le choix de la méthode dépend de l'application spécifique, des
+              contraintes matérielles et des exigences en termes de qualité
+            </li>
+            <li>
+              • Les développements futurs combineront probablement le meilleur
+              des approches traditionnelles et basées sur l’apprentissage
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer
+        class="text-center text-gray-600 mt-12 pt-8 border-t border-gray-200">
+        <p class="text-sm">
+          Défloutage d'images : Un guide pour débutants - Aperçu complet des
+          techniques et applications
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
